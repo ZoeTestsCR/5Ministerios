@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cuestionario sobre mi desempeño en los 5 ministerios</title>
+
+  <!-- Chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .block {
+      background: white;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .option {
+      margin: 10px 0;
+    }
+    button {
+      display: block;
+      margin: 25px auto;
+      padding: 12px 25px;
+      font-size: 16px;
+      background: #2c6bed;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1f4fbf;
+    }
+    #results {
+      display: none;
+      margin-top: 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Cuestionario sobre mi desempeño en los 5 ministerios</h1>
+<p style="text-align:center">
+  En cada bloque elige <strong>una sola afirmación</strong> con la que más te identifiques.
+</p>
+
+<form id="testForm">
+
+  <!-- ===================================================== -->
+  <!-- AQUÍ VAN LOS 50 BLOQUES (PEGAR LOS DEL EXCEL) -->
+  <!-- ===================================================== -->
+
+  <!-- EJEMPLO DE BLOQUE -->
+  <div class="block">
+    <h3>Bloque 1</h3>
+    <div class="option">
+      <label>
+        <input type="radio" name="q1" value="A">
+        TEXTO DE AFIRMACIÓN 1 (Apóstol)
+      </label>
+    </div>
+    <div class="option">
+      <label>
+        <input type="radio" name="q1" value="P">
+        TEXTO DE AFIRMACIÓN 2 (Profeta)
+      </label>
+    </div>
+  </div>
+
+  <!-- REPETIR HASTA BLOQUE 50 -->
+
+  <button type="button" onclick="calculateResults()">Ver resultados</button>
+
+</form>
+
+<div id="results">
+  <h2>Resultados</h2>
+  <canvas id="chart"></canvas>
+
+  <div id="textResults"></div>
+
+  <button onclick="exportPDF()">Exportar a PDF</button>
+</div>
+
+<script>
+function calculateResults() {
+  const totalBlocks = 50;
+  const scores = { A:0, P:0, E:0, PA:0, M:0 };
+
+  for (let i = 1; i <= totalBlocks; i++) {
+    const answer = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!answer) {
+      alert("Debes responder todos los bloques antes de continuar.");
+      return;
+    }
+    scores[answer.value]++;
+  }
+
+  const labels = ["Apóstol", "Profeta", "Evangelista", "Pastor", "Maestro"];
+  const values = [
+    (scores.A / totalBlocks) * 100,
+    (scores.P / totalBlocks) * 100,
+    (scores.E / totalBlocks) * 100,
+    (scores.PA / totalBlocks) * 100,
+    (scores.M / totalBlocks) * 100
+  ];
+
+  document.getElementById("results").style.display = "block";
+
+  new Chart(document.getElementById("chart"), {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Porcentaje (%)",
+        data: values
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100
+        }
+      }
+    }
+  });
+
+  document.getElementById("textResults").innerHTML = `
+    <p><strong>Apóstol:</strong> ${values[0].toFixed(1)}%</p>
+    <p><strong>Profeta:</strong> ${values[1].toFixed(1)}%</p>
+    <p><strong>Evangelista:</strong> ${values[2].toFixed(1)}%</p>
+    <p><strong>Pastor:</strong> ${values[3].toFixed(1)}%</p>
+    <p><strong>Maestro:</strong> ${values[4].toFixed(1)}%</p>
+  `;
+}
+
+function exportPDF() {
+  const element = document.getElementById("results");
+  html2pdf()
+    .from(element)
+    .set({
+      margin: 10,
+      filename: 'resultado_5_ministerios.pdf',
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: 'portrait' }
+    })
+    .save();
+}
+</script>
+
+</body>
+</html>
