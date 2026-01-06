@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body class="bg-gray-100 p-6">
@@ -13,9 +14,11 @@
 <h1 class="text-2xl font-bold text-center mb-6">
 Cuestionario sobre mi desempeño en los 5 ministerios
 </h1>
+
 <p style="text-align:center">
   En cada bloque elige <strong>una sola afirmación</strong> con la que más te identifiques.
 </p>
+
 <form id="quiz"></form>
 
 <button id="finish" disabled class="mt-6 bg-black text-white px-4 py-2 rounded w-full">
@@ -67,15 +70,33 @@ document.getElementById("finish").onclick=()=>{
  Object.values(answers).forEach(v=>counts[v]++);
  const percentages=Object.values(counts).map(v=>Math.round(v/blocks.length*100));
 
- new Chart(document.getElementById("chart"),{
+ /*new Chart(document.getElementById("chart"),{
   type:"pie",
   data:{labels:Object.values(ministries),datasets:[{data:percentages}]}
- });
+ });*/
+
+window.chart = new Chart(document.getElementById("chart"),{
+ type:"pie",
+ data:{
+   labels:Object.values(ministries),
+   datasets:[{data:percentages}]
+ },
+ options:{
+   plugins:{
+     datalabels:{
+       color:"#fff",
+       font:{ weight:"bold", size:14 },
+       formatter:(value)=> value + "%"
+     }
+   }
+ },
+ plugins:[ChartDataLabels]
+});
 
  window.finalResults={counts,percentages};
 };
 
-function exportPDF(){
+/*function exportPDF(){
  const {jsPDF}=window.jspdf;
  const doc=new jsPDF();
  doc.text("Resultados – 5 Ministerios",20,20);
@@ -85,8 +106,27 @@ function exportPDF(){
   y+=10;
  });
  doc.save("resultados_5_ministerios.pdf");
+}*/
+
+function exportPDF(){
+ const {jsPDF}=window.jspdf;
+ const doc=new jsPDF();
+
+ doc.text("Resultados – 5 Ministerios",20,20);
+
+ // Agregar gráfico
+ const canvas = document.getElementById("chart");
+ const imgData = canvas.toDataURL("image/png", 1.0);
+ doc.addImage(imgData, "PNG", 20, 30, 170, 170);
+
+ let y = 210;
+ Object.keys(ministries).forEach((k,i)=>{
+   doc.text(`${ministries[k]}: ${finalResults.percentages[i]}%`,20,y);
+   y+=8;
+ });
+
+ doc.save("resultados_5_ministerios.pdf");
 }
 </script>
 </body>
 </html>
-
