@@ -69,11 +69,11 @@ function EscondeParrafo() {
     
     let paragraph = document.getElementById('enunciado');
     let paragraph2 = document.getElementById('titulo1');
-    let paragraph3 = document.getElementById('titulo2');
+
     
     paragraph.style.display = 'none';
     paragraph2.style.display = 'none';
-    paragraph3.style.visibility = 'visible';
+   
     
 }
 
@@ -91,6 +91,9 @@ document.getElementById("finish").onclick=()=>{
   data:{labels:Object.values(ministries),datasets:[{data:percentages}]}
  });*/
 EscondeParrafo();
+  <h1 style="display: none; class="text-2xl font-bold text-center mb-6" id="titulo2">
+Resultado - 5 ministerios
+</h1>
 window.chart = new Chart(document.getElementById("chart"),{
  type:"pie",
  data:{
@@ -146,3 +149,4 @@ function exportPDF(){
 </script>
 </body>
 </html>
+
