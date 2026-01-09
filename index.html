@@ -77,6 +77,20 @@ function EscondeParrafo() {
     
 }
 
+const maxPerMinistry = {
+  apostol: 0,
+  profeta: 0,
+  evangelista: 0,
+  pastor: 0,
+  maestro: 0
+};
+
+// Contar apariciones reales en los 50 bloques
+blocks.forEach(b => {
+  maxPerMinistry[b.a_min]++;
+  maxPerMinistry[b.b_min]++;
+});
+
 document.getElementById("finish").onclick=()=>{
  quiz.classList.add("hidden");
  document.getElementById("finish").classList.add("hidden");
@@ -84,7 +98,9 @@ document.getElementById("finish").onclick=()=>{
 
  const counts={apostol:0,profeta:0,evangelista:0,pastor:0,maestro:0};
  Object.values(answers).forEach(v=>counts[v]++);
- const percentages=Object.values(counts).map(v=>Math.round(v/blocks.length*100));
+ const percentages = Object.keys(counts).map(key => {
+  return Math.round((counts[key] / maxPerMinistry[key]) * 100);
+});
 
  /*new Chart(document.getElementById("chart"),{
   type:"pie",
@@ -159,4 +175,3 @@ function exportPDF(){
 </script>
 </body>
 </html>
-
